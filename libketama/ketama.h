@@ -31,7 +31,8 @@
 
 #include <sys/sem.h>    /* semaphore functions and structs. */
 
-#define MC_SHMSIZE  524288  // 512KB should be ample.
+#define POINTS_PER_SERVER 1600
+#define MAX_SERVERS_EXPECTED 250
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -68,6 +69,8 @@ typedef struct
 } continuum;
 
 typedef continuum* ketama_continuum;
+
+#define MC_SHMSIZE  (POINTS_PER_SERVER * MAX_SERVERS_EXPECTED * sizeof(mcs))
 
 
 /** \brief Get a continuum struct that contains a reference to the server list.

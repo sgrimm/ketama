@@ -411,13 +411,14 @@ ketama_create_continuum( key_t key, char* filename )
 #endif
 
     /* Continuum will hold one mcs for each point on the circle: */
-    mcs continuum[ numservers * 160 ];
+    mcs continuum[ numservers * POINTS_PER_SERVER ];
     unsigned int i, k, cont = 0;
 
     for( i = 0; i < numservers; i++ )
     {
         float pct = (float)slist[i].memory / (float)memory;
-        unsigned int ks = floorf( pct * 40.0 * (float)numservers );
+        float points_per_hash = POINTS_PER_SERVER / 4.0;
+        unsigned int ks = floorf( pct * points_per_hash * (float)numservers );
 #ifdef DEBUG
         int hpct = floorf( pct * 100.0 );
 
@@ -427,7 +428,7 @@ ketama_create_continuum( key_t key, char* filename )
 
         for( k = 0; k < ks; k++ )
         {
-            /* 40 hashes, 4 numbers per hash = 160 points per server */
+            /* 400 hashes, 4 numbers per hash = 1600 points per server */
             char ss[30];
             unsigned char digest[16];
 
@@ -505,7 +506,7 @@ ketama_roll( ketama_continuum* contptr, char* filename )
 //     setlogmask( LOG_UPTO ( LOG_NOTICE | LOG_ERR | LOG_INFO ) );
 //     openlog( "ketama", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1 );
 
-    key = ftok( filename, 'R' );
+    key = ftok( filename, (POINTS_PER_SERVER % 251) + 1 );
     if ( key == -1 )
     {
         sprintf( k_error, "Invalid filename specified: %s", filename );
